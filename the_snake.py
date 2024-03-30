@@ -30,7 +30,7 @@ APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 
 # Скорость движения змейки:
-SPEED = 5
+SPEED = 10
 
 # Настройка игрового окна:
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
@@ -68,8 +68,8 @@ class Apple(GameObject):
 
     @staticmethod
     def randomize_position():
-        position_x = randint(0, 32) * GRID_SIZE
-        position_y = randint(0, 24) * GRID_SIZE
+        position_x = randint(0, 31) * GRID_SIZE
+        position_y = randint(0, 23) * GRID_SIZE
         # Или return (randint(0,32), randint(0,24)).
         return (position_x, position_y)
 
@@ -108,17 +108,13 @@ class Snake(GameObject):
             new_position_x -= SCREEN_WIDTH
         elif new_position_x < 0:
             new_position_x += SCREEN_WIDTH
-        
+
         if new_position_y > SCREEN_HEIGHT:
             new_position_y -= SCREEN_HEIGHT
         elif new_position_y < 0:
             new_position_y += SCREEN_HEIGHT
-
         new_position = (new_position_x, new_position_y)
-
         self.positions.insert(0, new_position)
-        self.last = self.positions[-1]
-        self.positions.pop()
 
     # Метод draw класса Snake из прекода
     def draw(self):
@@ -141,14 +137,23 @@ class Snake(GameObject):
     def get_head_position(self):
         return self.positions[0]
 
-    def reset():  # сброс змеи после столкновения с собой.
-        pass
+    def reset(self):  # сброс змеи после столкновения с собой.
+        for element in self.positions[1:]:
+            if self.get_head_position() == element:
+                for element in self.positions:
+                    old_snake = pygame.Rect(element, (GRID_SIZE, GRID_SIZE))
+                    pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, old_snake)
+                return True
 
     def check_apple(self, object_apple):
         if self.get_head_position() == object_apple.position:
-            self.length += 1
-            print('yes', self.length)
-        return self.length
+            self.length += 1  # Над решить...
+            self.last = None
+            return True
+        else:
+            self.last = self.positions[-1]
+            self.positions.pop()
+            return False
 
 
 # Функция обработки действий пользователя
@@ -171,23 +176,25 @@ def handle_keys(game_object):
 
 def main():
     """написать docstring"""
-    # Тут нужно создать экземпляры классов.
+    # Исходные экземпляры классов.
     red_apple = Apple()
     green_snake = Snake()
-    screen
-
     while True:
         clock.tick(SPEED)
-        # Тут опишите основную логику игры.
-        # red_apple.randomize_position()
-        red_apple.draw()
+        red_apple.draw()  # Отрисовка яблока
         handle_keys(green_snake)  # Нажатие кнопок на клавиатуре
         green_snake.update_direction()  # Обновление направления движения
-        green_snake.move()  # Сдвижение змеи
-        green_snake.check_apple(red_apple)  # Проверка на съедание яблока
+        green_snake.move()  # движение змеи
+        if green_snake.check_apple(red_apple):  # Проверка на съедание яблока
+            red_apple = Apple()  # Создание нового объекта "Яблоко"
         green_snake.draw()  # Отрисовка змеи
         pygame.display.update()  # обновление экрана
+        if green_snake.reset():  # Проверка на столкновение с собой
+            green_snake = Snake()  # Создание нового объекта "Змея"
 
 
 if __name__ == '__main__':
     main()
+
+
+# если будут ошибки, игнорить
