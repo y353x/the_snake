@@ -30,7 +30,7 @@ APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 
 # Скорость движения змейки:
-SPEED = 3
+SPEED = 5
 
 # Настройка игрового окна:
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
@@ -83,18 +83,13 @@ class Apple(GameObject):
 class Snake(GameObject):
     """написать docstring"""
 
-    # length = 1
+    length = 1
     body_color = (0, 255, 0)
-    # position = ...
-    # positions: list = [GameObject.position]
     direction = RIGHT
-    # next_direction = None
+    next_direction = None
 
     def __init__(self):  # Инициализирует начальное состояние змейки.
-        self.length = 1
-        self.next_direction = None
         self.positions = [GameObject.position]
-        # self.last = self.positions[:-1]
 
     # Метод обновления направления после нажатия на кнопку
     # Из прекода.
@@ -107,22 +102,21 @@ class Snake(GameObject):
     # голову в начало списка positions и удаляя последний элемент, если длина
     # змейки не увеличилась.
     def move(self):
-        if self.direction == UP:
-            new_position = (self.positions[0][0] + UP[0] * GRID_SIZE,
-                            self.positions[0][1] + UP[1] * GRID_SIZE)
-            self.positions.insert(0, new_position)
-        elif self.direction == DOWN:
-            new_position = (self.positions[0][0] + DOWN[0] * GRID_SIZE,
-                            self.positions[0][1] + DOWN[1] * GRID_SIZE)
-            self.positions.insert(0, new_position)
-        elif self.direction == RIGHT:
-            new_position = (self.positions[0][0] + RIGHT[0] * GRID_SIZE,
-                            self.positions[0][1] + RIGHT[1] * GRID_SIZE)
-            self.positions.insert(0, new_position)
-        elif self.direction == LEFT:
-            new_position = (self.positions[0][0] + LEFT[0] * GRID_SIZE,
-                            self.positions[0][1] + LEFT[1] * GRID_SIZE)
-            self.positions.insert(0, new_position)
+        new_position_x = (self.positions[0][0] + self.direction[0] * GRID_SIZE)
+        new_position_y = (self.positions[0][1] + self.direction[1] * GRID_SIZE)
+        if new_position_x > SCREEN_WIDTH:
+            new_position_x -= SCREEN_WIDTH
+        elif new_position_x < 0:
+            new_position_x += SCREEN_WIDTH
+        
+        if new_position_y > SCREEN_HEIGHT:
+            new_position_y -= SCREEN_HEIGHT
+        elif new_position_y < 0:
+            new_position_y += SCREEN_HEIGHT
+
+        new_position = (new_position_x, new_position_y)
+
+        self.positions.insert(0, new_position)
         self.last = self.positions[-1]
         self.positions.pop()
 
@@ -149,6 +143,12 @@ class Snake(GameObject):
 
     def reset():  # сброс змеи после столкновения с собой.
         pass
+
+    def check_apple(self, object_apple):
+        if self.get_head_position() == object_apple.position:
+            self.length += 1
+            print('yes', self.length)
+        return self.length
 
 
 # Функция обработки действий пользователя
@@ -179,83 +179,15 @@ def main():
     while True:
         clock.tick(SPEED)
         # Тут опишите основную логику игры.
-        red_apple.randomize_position()
+        # red_apple.randomize_position()
         red_apple.draw()
-        handle_keys(green_snake)
-        green_snake.update_direction()
-        green_snake.move()
-        green_snake.draw()
-        pygame.display.update()
+        handle_keys(green_snake)  # Нажатие кнопок на клавиатуре
+        green_snake.update_direction()  # Обновление направления движения
+        green_snake.move()  # Сдвижение змеи
+        green_snake.check_apple(red_apple)  # Проверка на съедание яблока
+        green_snake.draw()  # Отрисовка змеи
+        pygame.display.update()  # обновление экрана
 
 
 if __name__ == '__main__':
     main()
-
-
-# Метод draw класса Apple
-# def draw(self):
-#     rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
-#     pygame.draw.rect(screen, self.body_color, rect)
-#     pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
-
-# # Метод draw класса Snake
-# def draw(self):
-#     for position in self.positions[:-1]:
-#         rect = (pygame.Rect(position, (GRID_SIZE, GRID_SIZE)))
-#         pygame.draw.rect(screen, self.body_color, rect)
-#         pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
-
-#     # Отрисовка головы змейки
-#     head_rect = pygame.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
-#     pygame.draw.rect(screen, self.body_color, head_rect)
-#     pygame.draw.rect(screen, BORDER_COLOR, head_rect, 1)
-
-#     # Затирание последнего сегмента
-#     if self.last:
-#         last_rect = pygame.Rect(self.last, (GRID_SIZE, GRID_SIZE))
-#         pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
-
-# Функция обработки действий пользователя
-# def handle_keys(game_object):
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             pygame.quit()
-#             raise SystemExit
-#         elif event.type == pygame.KEYDOWN:
-#             if event.key == pygame.K_UP and game_object.direction != DOWN:
-#                 game_object.next_direction = UP
-#             elif event.key == pygame.K_DOWN and game_object.direction != UP:
-#                 game_object.next_direction = DOWN
-#             elif event.key == pygame.K_LEFT and game_object.direction != RIGHT:
-#                 game_object.next_direction = LEFT
-#             elif event.key == pygame.K_RIGHT and game_object.direction != LEFT:
-#                 game_object.next_direction = RIGHT
-
-# Метод обновления направления после нажатия на кнопку
-# def update_direction(self):
-#     if self.next_direction:
-#         self.direction = self.next_direction
-#         self.next_direction = None
-
-
-
-    # def move(self):
-    #     if self.next_direction == UP:
-    #         new_position = (self.positions[0][0] + UP[0] * GRID_SIZE,
-    #                         self.positions[0][1] + UP[1] * GRID_SIZE)
-    #         print(new_position)
-    #         self.positions.insert(0, new_position)
-    #     elif self.next_direction == DOWN:
-    #         new_position = (self.positions[0][0] + DOWN[0] * GRID_SIZE,
-    #                         self.positions[0][1] + DOWN[1] * GRID_SIZE)
-    #         self.positions.insert(0, new_position)
-    #     elif self.next_direction == RIGHT:
-    #         new_position = (self.positions[0][0] + RIGHT[0] * GRID_SIZE,
-    #                         self.positions[0][1] + RIGHT[1] * GRID_SIZE)
-    #         self.positions.insert(0, new_position)
-    #     elif self.next_direction == LEFT:
-    #         new_position = (self.positions[0][0] + LEFT[0] * GRID_SIZE,
-    #                         self.positions[0][1] + LEFT[1] * GRID_SIZE)
-    #         self.positions.insert(0, new_position)
-
-    #     self.last = self.positions[-1]
