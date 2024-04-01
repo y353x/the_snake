@@ -56,7 +56,7 @@ class GameObject:
 class Apple(GameObject):
     """Класс, описывающий яблоко и действия с ним."""
 
-    def __init__(self, snake_positions):
+    def __init__(self, snake_positions=(0,0)):
         # Вызов функции рандом позиции.
         super().__init__(body_color=APPLE_COLOR)
         self.snake_positions = snake_positions
