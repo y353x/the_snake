@@ -89,11 +89,11 @@ class Apple(GameObject):
 
 class Snake(GameObject):
     """Класс, описывающий змейку и её поведение."""
-    
+
     def __init__(self, body_color=SNAKE_COLOR):
         super().__init__(body_color=body_color)
-        self.next_direction = None  # Заготовка под новое направление движения.
-        self.direction = RIGHT  # Исходное направление движения.
+        # Начальные параметры length, positions,
+        # direction, next_direction, согласно ТЗ.
         self.reset()
 
     def update_direction(self, next_direction=None):
@@ -162,6 +162,8 @@ class Snake(GameObject):
         self.length = 1
         self.positions = [self.position]
         self.last = False
+        self.direction = RIGHT  # Исходное направление движения.
+        self.next_direction = None
 
     def check_apple(self, object_apple):
         """Проверка, съела ли змейка яблоко."""
@@ -197,7 +199,8 @@ def main():
         clock.tick(SPEED)
         red_apple.draw()  # Отрисовка яблока.
         handle_keys(green_snake)  # Нажатие кнопок на клавиатуре.
-        green_snake.update_direction(green_snake.next_direction)  # Обновление направления движения.
+        # Обновление направления движения.
+        green_snake.update_direction(green_snake.next_direction)
         green_snake.move(red_apple)  # Движение змеи.
         if green_snake.get_head_position() in green_snake.positions[1:]:
             green_snake.reset()
