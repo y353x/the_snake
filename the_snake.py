@@ -1,5 +1,5 @@
 from random import randint
-import pygame as pg  # Сокращение, согласно замечанию.
+import pygame as pg
 
 # Инициализация PyGame:
 pg.init()
@@ -70,7 +70,7 @@ class Apple(GameObject):
         (в зависимости от положения змейки)
         """
         while True:
-            # Присваиваем рандом координаты Х и У.
+            # Присваиваем случайные координаты Х и У.
             self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                              randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
             # Если self.position не в теле змейки.
@@ -89,18 +89,17 @@ class Apple(GameObject):
 
 class Snake(GameObject):
     """Класс, описывающий змейку и её поведение."""
-
+    
     def __init__(self, body_color=SNAKE_COLOR):
         super().__init__(body_color=body_color)
         self.next_direction = None  # Заготовка под новое направление движения.
         self.direction = RIGHT  # Исходное направление движения.
         self.reset()
 
-    def update_direction(self):
+    def update_direction(self, next_direction=None):
         """Обновляет направление движения змейки."""
-        if self.next_direction:
-            self.direction = self.next_direction
-            self.next_direction = None
+        if next_direction:
+            self.direction = next_direction
 
     def move(self, object_apple):
         """Обновляет позицию змейки, добавляя новую голову и удаляя
@@ -198,7 +197,7 @@ def main():
         clock.tick(SPEED)
         red_apple.draw()  # Отрисовка яблока.
         handle_keys(green_snake)  # Нажатие кнопок на клавиатуре.
-        green_snake.update_direction()  # Обновление направления движения.
+        green_snake.update_direction(green_snake.next_direction)  # Обновление направления движения.
         green_snake.move(red_apple)  # Движение змеи.
         if green_snake.get_head_position() in green_snake.positions[1:]:
             green_snake.reset()
